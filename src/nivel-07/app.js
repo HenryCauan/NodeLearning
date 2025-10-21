@@ -16,6 +16,18 @@ app.get('/produtos', (req, res) => {
   res.json(produtos);
 });
 
+// Adicione esta nova rota para buscar um produto específico pelo ID
+app.get('/produtos/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const produto = produtos.find(p => p.id === id);
+  
+  if (!produto) {
+    return res.status(404).json({ erro: 'Produto não encontrado' });
+  }
+  
+  res.json(produto);
+});
+
 // Rota para criar um novo produto
 app.post('/produtos', (req, res) => {
   /*
@@ -47,6 +59,50 @@ app.post('/produtos', (req, res) => {
   // Retorna o novo produto criado (201 = Created)
   res.status(201).json(novoProduto);
 });
+
+// Atualiza um produto pelo id usando método PUT
+// O que significa esse '/produtos/:id'?
+// -------------------------------------
+// O ':id' na rota é um *parâmetro de rota dinâmico*.
+// Ele permite que você acesse um valor variável na URL. Exemplo:
+// PUT /produtos/42
+// Nesse caso, req.params.id será "42".
+app.put('/produtos/:id', (req, res) => {
+  // 1. Busca o id fornecido na URL e transforma em número
+  const id = Number(req.params.id);
+
+  // 2. Procura no array de produtos qual o índice (posição) do produto com aquele id
+  const index = produtos.findIndex(p => p.id === id);
+
+  // 3. Atualiza o produto encontrado:
+  //    - ...produtos[index] pega todos os dados antigos do produto
+  //    - ...req.body pega os dados enviados na requisição (ex: { nome: 'Novo Nome' })
+  //    - Juntando as duas informações, atualiza só o que foi enviado, o resto permanece igual
+  produtos[index] = { ...produtos[index], ...req.body };
+
+  // 4. Retorna o produto atualizado em formato JSON como resposta
+  res.json(produtos[index]);
+})
+
+app.delete('/produtos/:id', (req, res) => {
+  // 1. Busca o id fornecido na URL e transforma em número
+  const id = Number(req.params.id);
+  
+  // 2. Procura no array de produtos qual o índice (posição) do produto com aquele id
+  const index = produtos.findIndex(p => p.id === id);
+  
+  // 3. Validação: se o produto não for encontrado (index = -1), retorna erro 404
+  if (index === -1) {
+    return res.status(404).json({ erro: 'Produto não encontrado' });
+  }
+  
+  // 4. Remove o produto do array usando splice (remove 1 elemento na posição index)
+  produtos.splice(index, 1);
+  
+  // 5. Retorna status 204 (No Content) indicando sucesso na remoção
+  res.status(204).send();
+})
+
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);
