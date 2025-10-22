@@ -234,4 +234,55 @@ app.use((req, res, next) => {
 
 ---
 
-Quer que eu monte um **plano de estudo semanal com esses exercícios**, tipo “Semana 1 → Node básico”, “Semana 2 → Express”, com tarefas diárias e desafios práticos? Isso ajuda muito na retenção.
+Aqui estão os status HTTP mais apropriados para cada operação:
+
+## **GET** - Buscar dados
+- **200 OK** - Sucesso na busca
+```javascript
+app.get('/ingredients', (req, res) => {
+  res.status(200).json(ingredients); // ← 200 é padrão, pode omitir
+})
+```
+
+## **POST** - Criar novo recurso  
+- **201 Created** - Recurso criado com sucesso
+```javascript
+app.post('/ingredients', (req, res) => {
+  // ... criar item
+  res.status(201).json(novoItem); // ← Sempre 201 para criação
+})
+```
+
+## **PUT** - Atualizar recurso existente
+- **200 OK** - Atualização bem-sucedida  
+- **404 Not Found** - Recurso não existe
+```javascript
+app.put('/ingredients/:id', (req, res) => {
+  if (index === -1) {
+    return res.status(404).json({ error: 'Não encontrado' });
+  }
+  // ... atualizar
+  res.status(200).json(ingredients[index]); // ← 200 para atualização
+})
+```
+
+## **DELETE** - Remover recurso
+- **200 OK** - Remoção bem-sucedida (com corpo de resposta)
+- **204 No Content** - Remoção bem-sucedida (sem corpo)  
+- **404 Not Found** - Recurso não existe
+```javascript
+app.delete('/ingredients/:id', (req, res) => {
+  if (index === -1) {
+    return res.status(404).json({ error: 'Não encontrado' });
+  }
+  // ... remover
+  res.status(200).json({ message: 'Removido com sucesso' }); // ← 200 com mensagem
+  // ou: res.status(204).send(); // ← 204 sem conteúdo
+})
+```
+
+## **Erros comuns:**
+- **400 Bad Request** - Dados inválidos no body
+- **500 Internal Server Error** - Erro inesperado no servidor
+
+Esses status seguem as convenções RESTful e são semanticamente corretos!
