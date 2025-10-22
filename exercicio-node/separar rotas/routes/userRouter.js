@@ -17,7 +17,7 @@ router.get('/', (req, res) => {
     const html = `
       <h1>Lista de Usuários</h1>
       <ul>
-        ${usuarios.map(p => `<li>${p.nome}</li>`).join('')}
+        ${usuarios.map(p => `<li>${p.nome}</li><li>${p.idade}</li>`).join('')}
       </ul>
     `;
     return res.send(html);
