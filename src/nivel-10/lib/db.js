@@ -3,8 +3,12 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 // Obter caminho absoluto do diretório atual (necessário para ES modules)
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Essas duas variáveis servem para obter os caminhos dos arquivos e diretórios atuais no contexto de ES Modules.
+// __filename retorna o caminho absoluto do arquivo atual.
+// __dirname retorna o diretório onde este arquivo está localizado.
+
+const __filename = fileURLToPath(import.meta.url); // Caminho do arquivo atual
+const __dirname = path.dirname(__filename);        // Caminho da pasta do arquivo atual
 
 // Caminho para o arquivo do banco de dados
 const dbPath = path.join(__dirname, '../database/app.db');
@@ -24,34 +28,40 @@ db.exec(`
 `);
 
 // Preparar statements SQL para melhor performance
+// Por que (pq) e para que (pra que) fazer statements em banco de dados?
+// 
+// Statements preparados (prepared statements) são usados para:
+// 1. Aumentar a performance: O banco de dados compila o SQL uma vez, reutilizando para várias execuções.
+// 2. Ter mais segurança: Evitam SQL Injection porque os dados são passados separadamente dos comandos SQL.
+// 3. Código mais organizado e fácil de manter.
+//
+// Exemplo prático: No backend com sqlite, podemos preparar vários statements que serão usados repetidamente.
+
 const stmt = {
-  // CREATE - Inserir novo usuário
+  // INSERT: Criação de usuário novo
   insert: db.prepare(`
-    INSERT INTO users (name, email, age) 
+    INSERT INTO users (name, email, age)
     VALUES (?, ?, ?)
   `),
-  
-  // READ - Buscar todos os usuários
+  // SELECT: Buscar todos os usuários
   selectAll: db.prepare('SELECT * FROM users'),
-  
-  // READ - Buscar usuário por ID
+  // SELECT: Buscar usuário por id
   selectById: db.prepare('SELECT * FROM users WHERE id = ?'),
-  
-  // UPDATE - Atualizar usuário
+  // UPDATE: Editar dados do usuário
   update: db.prepare(`
-    UPDATE users 
-    SET name = ?, email = ?, age = ? 
+    UPDATE users
+    SET name = ?, email = ?, age = ?
     WHERE id = ?
   `),
-  
-  // DELETE - Remover usuário
+  // DELETE: Remover usuário
   delete: db.prepare('DELETE FROM users WHERE id = ?'),
-  
-  // Verificar se email já existe
-  checkEmail: db.prepare('SELECT id FROM users WHERE email = ?')
+  // Checar se já existe o email cadastrado
+  checkEmail: db.prepare('SELECT id FROM users WHERE email = ?'),
 };
 
-// Funções de CRUD
+// CRUD é um acrônimo para Create (Criar), Read (Ler), Update (Atualizar) e Delete (Deletar).
+// Essas são as quatro operações básicas usadas para manipular dados em um banco de dados.
+// As funções abaixo implementam essas operações para o modelo de usuário.
 export const userModel = {
   // Criar usuário
   create: (name, email, age) => {
