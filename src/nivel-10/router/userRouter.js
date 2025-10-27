@@ -12,8 +12,8 @@ router.get("/", (req, res) => {
   } catch (error) {
     res.status(500).json({ error: "Erro ao buscar usuários" });
   }
+  
 });
-
 // GET /users/:id - Buscar usuário por ID
 router.get("/:id", validateId, (req, res) => {
   try {

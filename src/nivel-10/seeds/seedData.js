@@ -20,6 +20,10 @@ const seedData = () => {
 };
 
 // Executar apenas se chamado diretamente
+// Esse bloco verifica se o arquivo está sendo executado diretamente com Node.js (e não importado como módulo em outro arquivo).
+// Ele compara o caminho do arquivo atual (`import.meta.url`) com o caminho do arquivo chamado no terminal (`process.argv[1]`).
+// Se for igual, chama a função seedData() para popular o banco de dados com os dados de seed.
+// Ou seja, garante que a função de seed só é executada quando rodamos `node src/nivel-10/seeds/seedData.js` diretamente.
 if (import.meta.url === `file://${process.argv[1]}`) {
   seedData();
 }
